@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -125,13 +126,23 @@ ${mdContent}
                 return frontmatter + brandSection + researchSection;
             };
 
-            const downloadSkill = () => {
+            const downloadSkill = async () => {
                 const content = generateSkillContent();
-                const blob = new Blob([content], { type: 'text/markdown' });
+                const folderName = skillName || 'your-skill';
+
+                // Create a zip file with the skill structure
+                const zip = new JSZip();
+                const skillFolder = zip.folder(folderName);
+                skillFolder.file('SKILL.md', content);
+
+                // Generate the zip file
+                const blob = await zip.generateAsync({ type: 'blob' });
+
+                // Download as .skill file
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${skillName || 'skill'}_SKILL.md`;
+                a.download = `${folderName}.skill`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -322,7 +333,7 @@ ${mdContent}
                                             className="flex-1 px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                             style={{ background: '#ec4899', color: 'white' }}
                                         >
-                                            Download SKILL.md
+                                            Download .skill File
                                         </button>
                                     </div>
                                 </div>
@@ -365,7 +376,7 @@ ${mdContent}
                                         </li>
                                         <li className="flex items-start">
                                             <span className="font-bold mr-3" style={{ color: '#ec4899' }}>5.</span>
-                                            <span>Review the preview and download your SKILL.md file</span>
+                                            <span>Download your .skill file and upload it directly to Claude!</span>
                                         </li>
                                     </ol>
                                 </div>
@@ -395,6 +406,10 @@ ${mdContent}
                                         <li className="flex items-start">
                                             <span className="mr-2" style={{ color: '#ec4899' }}>✦</span>
                                             <span>Edit the research content directly or replace the entire file</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="mr-2" style={{ color: '#ec4899' }}>✦</span>
+                                            <span>The .skill file can be uploaded directly to Claude - no extra steps!</span>
                                         </li>
                                     </ul>
                                 </div>
